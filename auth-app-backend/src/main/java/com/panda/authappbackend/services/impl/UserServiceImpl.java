@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setEnabled(userDto.isEnabled());
         existingUser.setProvider(userDto.getProvider() != null ? userDto.getProvider() : existingUser.getProvider());
         existingUser.setUpdatedAt(Instant.now());
-        
+
         // TODO: change password update logic to hash the password
         existingUser.setPassword(userDto.getPassword() != null ? userDto.getPassword() : existingUser.getPassword());
 
