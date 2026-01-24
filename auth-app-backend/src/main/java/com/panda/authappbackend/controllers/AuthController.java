@@ -3,10 +3,14 @@ package com.panda.authappbackend.controllers;
 import com.panda.authappbackend.dtos.LoginRequest;
 import com.panda.authappbackend.dtos.TokenResponse;
 import com.panda.authappbackend.dtos.UserDto;
+import com.panda.authappbackend.models.RefreshToken;
 import com.panda.authappbackend.models.User;
+import com.panda.authappbackend.repositroies.RefreshTokenRepository;
 import com.panda.authappbackend.repositroies.UserRepository;
 import com.panda.authappbackend.security.JwtService;
 import com.panda.authappbackend.services.AuthService;
+import com.panda.authappbackend.services.impl.CookieService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -20,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -30,16 +37,35 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final ModelMapper modelMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final CookieService cookieService;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         Authentication authenticate = authenticate(loginRequest);
         User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new BadCredentialsException("User not found"));
         if(!user.isEnabled()) {
             throw new BadCredentialsException("User account is disabled");
         }
+
+        // Create and persist refresh token (jti tracked)
+        String jti = UUID.randomUUID().toString();
+        RefreshToken rt = RefreshToken.builder()
+                .jti(jti)
+                .user(user)
+                .createdAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(jwtService.getRefreshTtlSeconds()))
+                .revoked(false)
+                .build();
+        refreshTokenRepository.save(rt);
+
         String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user, jti);
+
+        cookieService.attachRefreshCookie(response, refreshToken, (int) jwtService.getRefreshTtlSeconds());
+        cookieService.addNoStoreHeaders(response);
+
         TokenResponse tokenResponse = TokenResponse.of(accessToken, "", jwtService.getAccessTtlSeconds(), modelMapper.map(user, UserDto.class));
         return ResponseEntity.ok(tokenResponse);
     }
