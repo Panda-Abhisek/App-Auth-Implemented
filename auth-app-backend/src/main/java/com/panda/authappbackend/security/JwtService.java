@@ -4,6 +4,7 @@ import com.panda.authappbackend.models.Role;
 import com.panda.authappbackend.models.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
+@Data
 public class JwtService {
 
     private final SecretKey key;
