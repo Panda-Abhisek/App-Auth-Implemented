@@ -30,19 +30,19 @@ public class UserController {
     }
 
     // delete user
-    @DeleteMapping("{/userId}")
+    @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
     }
 
     //update user
-    @PutMapping("{/userId}")
+    @PutMapping("/{userId}")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable String userId) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userDto, userId));
     }
 
     // get user by id
-    @GetMapping("{/userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable String userId) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(userId));
     }
