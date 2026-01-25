@@ -2,10 +2,71 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type RegisterData from "@/models/RegisterData";
+import { registerUser } from "@/services/AuthService";
 import { motion } from "framer-motion";
 import { Github } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
-export default function Signup() {
+function Signup() {
+
+  const navigate = useNavigate();
+  const [data, setData] = useState<RegisterData>({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState(null);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // console.log(event.target.name);
+    // console.log(event.target.value);
+    setData((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
+  }
+
+  const handleFormSubmit = async (event: React.FormEvent) => {
+    event?.preventDefault()
+
+
+    // validation
+    if (data.name.trim() === '') {
+      toast.error("Name is required!!");
+      return;
+    }
+    if (data.email.trim() === '') {
+      toast.error("Email is required!!");
+      return;
+    }
+    if (data.password.trim() === '') {
+      toast.error("Password is required!!");
+      return;
+    }
+
+    console.log(data);
+    try {
+      const result = await registerUser(data);
+      console.log("Register user response: ", result);
+      toast.success("User registered!")
+      setData({
+        name: "",
+        email: "",
+        password: "",
+      });
+      navigate('/login')
+    } catch (error) {
+      console.log("Error ", error);
+      toast.error("User registration failed!!")
+    }
+
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <motion.div
@@ -58,13 +119,16 @@ export default function Signup() {
             </div>
 
             {/* Signup Form */}
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleFormSubmit}>
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
                   type="text"
                   placeholder="John Doe"
+                  name="name"
+                  value={data.name}
+                  onChange={handleInputChange}
                 />
               </div>
 
@@ -74,6 +138,9 @@ export default function Signup() {
                   id="email"
                   type="email"
                   placeholder="you@example.com"
+                  name="email"
+                  value={data.email}
+                  onChange={handleInputChange}
                 />
               </div>
 
@@ -82,7 +149,10 @@ export default function Signup() {
                 <Input
                   id="password"
                   type="password"
+                  name="password"
                   placeholder="••••••••"
+                  value={data.password}
+                  onChange={handleInputChange}
                 />
               </div>
 
@@ -116,3 +186,5 @@ export default function Signup() {
     </div>
   );
 }
+
+export default Signup;

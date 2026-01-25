@@ -1,8 +1,6 @@
 package com.panda.authappbackend.dtos;
 
 import com.panda.authappbackend.models.Provider;
-import com.panda.authappbackend.models.Role;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
@@ -21,7 +19,7 @@ public class UserDto {
     private String email;
     private String password;
     private String image;
-    private boolean enabled = true;
+    private Boolean enabled = true;
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
     private Provider provider = Provider.LOCAL;

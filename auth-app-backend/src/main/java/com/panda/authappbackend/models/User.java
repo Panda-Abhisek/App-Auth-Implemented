@@ -16,6 +16,7 @@ import java.util.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
+@ToString
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -8,6 +8,7 @@ import com.panda.authappbackend.models.User;
 import com.panda.authappbackend.repositroies.UserRepository;
 import com.panda.authappbackend.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -31,6 +33,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = modelMapper.map(userDto, User.class);
         user.setProvider(userDto.getProvider() != null ? userDto.getProvider() : Provider.LOCAL);
+//        log.info("User created to save: {}", user);
         // role assignment logic can be added here
         // TODO: Assign default role to user
         User savedUser = userRepository.save(user);
@@ -52,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
         existingUser.setUsername(userDto.getUsername() != null ? userDto.getUsername() : existingUser.getUsername());
         existingUser.setImage(userDto.getImage() != null ? userDto.getImage() : existingUser.getImage());
-        existingUser.setEnabled(userDto.isEnabled());
+        existingUser.setEnabled(userDto.getEnabled());
         existingUser.setProvider(userDto.getProvider() != null ? userDto.getProvider() : existingUser.getProvider());
         existingUser.setUpdatedAt(Instant.now());
 
