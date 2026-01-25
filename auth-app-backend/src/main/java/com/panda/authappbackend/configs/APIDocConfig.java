@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
                 title = "Auth Application build by Abhisek Panda.",
                 description = "Generic auth app that can be used with any application.",
                 contact = @Contact(
-                        name = "Durgesh Kumar Tiwari",
+                        name = "Abhisek Panda",
                         url = "https://www.linkedin.com/in/abhisek-panda-",
                         email = "abhisekpanda114@gmail.com"
                 ),
