@@ -1,9 +1,10 @@
 import './App.css'
+import FuturisticAuthHome from './components/home/FuturisticAuthHome'
 
 function App() {
   return (
     <>
-      <h1 className='p-10 text-3xl font-bold'>Hello Auth Frontend App</h1>
+      <FuturisticAuthHome />
     </>
   )
 }
