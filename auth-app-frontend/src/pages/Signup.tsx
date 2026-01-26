@@ -1,11 +1,13 @@
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import type RegisterData from "@/models/RegisterData";
 import { registerUser } from "@/services/AuthService";
 import { motion } from "framer-motion";
-import { Github } from "lucide-react";
+import { CheckCircle2Icon, Github } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
@@ -14,13 +16,13 @@ function Signup() {
 
   const navigate = useNavigate();
   const [data, setData] = useState<RegisterData>({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // console.log(event.target.name);
@@ -33,29 +35,31 @@ function Signup() {
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event?.preventDefault()
-
-
     // validation
-    if (data.name.trim() === '') {
+    if (data.username.trim() === '') {
       toast.error("Name is required!!");
+      setError("Name is required!!")
       return;
     }
     if (data.email.trim() === '') {
       toast.error("Email is required!!");
+      setError("Email is required!!");
       return;
     }
     if (data.password.trim() === '') {
       toast.error("Password is required!!");
+      setError("Password is required!!");
       return;
     }
 
     console.log(data);
     try {
+      setLoading(true);
       const result = await registerUser(data);
       console.log("Register user response: ", result);
       toast.success("User registered!")
       setData({
-        name: "",
+        username: "",
         email: "",
         password: "",
       });
@@ -63,8 +67,10 @@ function Signup() {
     } catch (error) {
       console.log("Error ", error);
       toast.error("User registration failed!!")
+      setError(error);
+    } finally {
+      setLoading(false);
     }
-
   }
 
   return (
@@ -118,6 +124,18 @@ function Signup() {
               <div className="flex-1 h-px bg-border" />
             </div>
 
+            {/* Alert Section */}
+            {error && (
+              <div className="mb-4">
+                <Alert variant={"destructive"}>
+                  <CheckCircle2Icon />
+                  <AlertTitle>
+                    {error?.response ? error?.response?.data?.message : error}
+                  </AlertTitle>
+                </Alert>
+              </div>
+            )}
+
             {/* Signup Form */}
             <form className="space-y-5" onSubmit={handleFormSubmit}>
               <div className="space-y-2">
@@ -126,8 +144,8 @@ function Signup() {
                   id="name"
                   type="text"
                   placeholder="John Doe"
-                  name="name"
-                  value={data.name}
+                  name="username"
+                  value={data.username}
                   onChange={handleInputChange}
                 />
               </div>
@@ -167,10 +185,15 @@ function Signup() {
 
               <Button
                 type="submit"
+                disabled={loading}
                 size="lg"
                 className="w-full rounded-2xl text-lg"
               >
-                Create Account
+                {loading ? (
+                  <><Spinner /> Creating Account</>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </form>
 

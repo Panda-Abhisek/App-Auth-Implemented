@@ -55,7 +55,7 @@ public class JwtService {
                         "roles", roles,
                         "typ", "access"
                 ))
-                .signWith(key, SignatureAlgorithm.ES512)
+                .signWith(key)
                 .compact();
     }
 
@@ -68,7 +68,7 @@ public class JwtService {
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(refreshTtlSeconds)))
                 .claim("typ", "refresh")
-                .signWith(key, SignatureAlgorithm.ES512)
+                .signWith(key)
                 .compact();
     }
 

@@ -19,6 +19,7 @@ public class AuthServiceImpl implements AuthService {
 
         // password encoding
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userDto.setEnabled(true); // Enable user by default, adjust as needed
 
         // you can add additional registration logic here:
         // - e.g., sending confirmation email

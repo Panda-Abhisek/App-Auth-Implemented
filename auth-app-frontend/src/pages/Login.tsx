@@ -1,11 +1,64 @@
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import type LoginData from "@/models/LoginData";
+import { loginUser } from "@/services/AuthService";
 import { motion } from "framer-motion";
-import { Github } from "lucide-react";
+import { CheckCircle2Icon, Github } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [lgoinData, setLoginData] = useState<LoginData>({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<any>(null);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginData((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
+  }
+
+  const handleFormSubmit = async (event: React.FormEvent) => {
+    event?.preventDefault()
+    // validation
+    if (lgoinData.email.trim() === '') {
+      setError("Email is required!!")
+      return;
+    }
+    if (lgoinData.password.trim() === '') {
+      setError("Password is required!!");
+      return;
+    }
+
+    console.log(lgoinData);
+    try {
+      setLoading(true);
+      const result = await loginUser(lgoinData);
+      console.log("Login user response: ", result);
+      toast.success("Login Successfull!")
+      setLoginData({
+        email: "",
+        password: "",
+      });
+      navigate('/dashboard')
+    } catch (error) {
+      console.log("Error ", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <motion.div
@@ -57,14 +110,29 @@ export default function Login() {
               <div className="flex-1 h-px bg-border" />
             </div>
 
+            {/* Alert Section */}
+            {error && (
+              <div className="mb-4">
+                <Alert variant={"destructive"}>
+                  <CheckCircle2Icon />
+                  <AlertTitle>
+                    {error?.response ? error?.response?.data?.message : error}
+                  </AlertTitle>
+                </Alert>
+              </div>
+            )}
+
             {/* Email / Password Form */}
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleFormSubmit}>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@example.com"
+                  name="email"
+                  value={lgoinData.email}
+                  onChange={handleInputChange}
                 />
               </div>
 
@@ -73,16 +141,24 @@ export default function Login() {
                 <Input
                   id="password"
                   type="password"
+                  name="password"
+                  value={lgoinData.password}
+                  onChange={handleInputChange}
                   placeholder="••••••••"
                 />
               </div>
 
               <Button
                 type="submit"
+                disabled={loading}
                 size="lg"
                 className="w-full rounded-2xl text-lg"
               >
-                Login
+                {loading ? (
+                  <><Spinner /> Logging in..</>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </form>
 

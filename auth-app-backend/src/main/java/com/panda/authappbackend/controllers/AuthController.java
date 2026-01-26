@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,9 +53,9 @@ public class AuthController {
     public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         Authentication authenticate = authenticate(loginRequest);
         User user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new BadCredentialsException("User not found"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password | User not found"));
         if(!user.isEnabled()) {
-            throw new BadCredentialsException("User account is disabled");
+            throw new DisabledException("User account is disabled");
         }
 
         // Create and persist refresh token (jti tracked)
@@ -74,7 +75,7 @@ public class AuthController {
         cookieService.attachRefreshCookie(response, refreshToken, (int) jwtService.getRefreshTtlSeconds());
         cookieService.addNoStoreHeaders(response);
 
-        TokenResponse tokenResponse = TokenResponse.of(accessToken, "", jwtService.getAccessTtlSeconds(), modelMapper.map(user, UserDto.class));
+        TokenResponse tokenResponse = TokenResponse.of(accessToken, refreshToken, jwtService.getAccessTtlSeconds(), modelMapper.map(user, UserDto.class));
         return ResponseEntity.ok(tokenResponse);
     }
 
