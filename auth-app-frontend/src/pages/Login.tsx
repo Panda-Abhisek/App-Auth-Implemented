@@ -1,3 +1,4 @@
+import useAuth from "@/auth/store";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,10 +15,13 @@ import { useNavigate } from "react-router";
 
 export default function Login() {
   const navigate = useNavigate();
+  const login = useAuth(state => state.login);
+
   const [lgoinData, setLoginData] = useState<LoginData>({
     email: "",
     password: "",
   });
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
 
@@ -43,8 +47,13 @@ export default function Login() {
     console.log(lgoinData);
     try {
       setLoading(true);
-      const result = await loginUser(lgoinData);
-      console.log("Login user response: ", result);
+
+      //login function : useAuth
+      await login(lgoinData)
+      // console.log(userInfo);
+      
+      // const result = await loginUser(lgoinData);
+      // console.log("Login user response: ", result);
       toast.success("Login Successfull!")
       setLoginData({
         email: "",
