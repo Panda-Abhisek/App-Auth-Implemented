@@ -21,19 +21,24 @@ spring:
       client:
         registration:
             google:
-                client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
-                client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
-                scope:
-                - email
-                - profile
-                - openid
+              client-id: 955196650543-5dsgi9j9dondp1u50j6ojb05405mppop.apps.googleusercontent.com
+              client-secret: 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
+#                client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
+#                client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
+#                .redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+#                scope:
+#                - email
+#                - profile
+#                - openid
             github:
-                client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
-                client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
-                .redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-                scope:
-                - read:user
-                - user:email
+#                client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
+#                client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
+#                .redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+              client-id: Ov23li6QvxWU020y7OGK
+              client-secret: d8668ae25878155d647cf54b72fa17ed125f47c6
+              scope:
+              - read:user
+              - user:email
 
 # JWT Security configuration
 security:
@@ -45,7 +50,7 @@ security:
     refresh-token-cookie-name: ${JWT_REFRESH_COOKIE_NAME:refreshToken}
     cookie-secure: ${JWT_COOKIE_SECURE:true}
     cookie-http-only: ${JWT_COOKIE_HTTP_ONLY:true}
-    cookie-same-site: ${JWT_COOKIE_SAME_SITE:lax}
+    cookie-same-site: ${JWT_COOKIE_SAME_SITE:None}
     cookie-domain: ${JWT_COOKIE_DOMAIN:localhost}
 
 app:
@@ -53,5 +58,5 @@ app:
     front-end-url: ${FRONTEND_URL:http://localhost:5173}
   auth:
     frontend:
-      success-redirect-url: ${FRONTEND_SUCCESS_REDIRECT_URL:http://localhost:5173/oauth/success}
-      failure-redirect-url: ${FRONTEND_FAILURE_REDIRECT_URL:http://localhost:5173/oauth/failure}
+      success-redirect-url: ${FRONTEND_SUCCESS_REDIRECT_URL:http://localhost:5173/oauth2/success}
+      failure-redirect-url: ${FRONTEND_FAILURE_REDIRECT_URL:http://localhost:5173/oauth2/failure}

@@ -18,7 +18,7 @@ function OAuthSuccess() {
         setIsRefreshing(true);
         try {
           const responseLoginData = await refreshToken();
-          console.log(responseLoginData);
+          console.log("Resonse Login Data from refresh token: ", responseLoginData);
           //login:
           changeLocalLoginData(
             responseLoginData.accessToken,
@@ -42,10 +42,22 @@ function OAuthSuccess() {
 
   return (
     <div className="p-10 flex flex-col gap-3 justify-center items-center">
-      <Spinner />
-      <h1 className="text-2xl font-semibold">Please wait....</h1>
+      {/* <Spinner />
+      <h1 className="text-2xl font-semibold">Please wait....</h1> */}
+
+      <p>Hello</p>
     </div>
   );
 }
 
 export default OAuthSuccess;
+
+// import React from 'react'
+
+// const OAuthSuccess = () => {
+//   return (
+//     <div>OAuthSuccess</div>
+//   )
+// }
+
+// export default OAuthSuccess

@@ -94,15 +94,9 @@ public class AuthController {
 
     //access and refresh token renew karne lie lie api
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(
-            @RequestBody(required = false) RefreshTokenRequest body,
-            HttpServletResponse response,
-            HttpServletRequest request
-    ) throws InterruptedException {
-
+    public ResponseEntity<TokenResponse> refreshToken(@RequestBody(required = false) RefreshTokenRequest body, HttpServletResponse response, HttpServletRequest request) throws InterruptedException {
         String refreshToken = readRefreshTokenFromRequest(body, request).orElseThrow(() -> new BadCredentialsException("Refresh token is missing"));
-
-        if (!jwtService.isRefreshToken(refreshToken)) {
+        if(!jwtService.isRefreshToken(refreshToken)){
             throw new BadCredentialsException("Invalid Refresh Token Type");
         }
 
@@ -110,21 +104,21 @@ public class AuthController {
         UUID userId = jwtService.getUserId(refreshToken);
         RefreshToken storedRefreshToken = refreshTokenRepository.findByJti(jti).orElseThrow(() -> new BadCredentialsException("Refresh token not recognized"));
 
-        if (storedRefreshToken.isRevoked()) {
+        if(storedRefreshToken.isRevoked()){
             throw new BadCredentialsException("Refresh token expired or revoked");
         }
 
-        if (storedRefreshToken.getExpiresAt().isBefore(Instant.now())) {
+        if(storedRefreshToken.getExpiresAt().isBefore(Instant.now())){
             throw new BadCredentialsException("Refresh token expired");
         }
 
-        if (!storedRefreshToken.getUser().getId().equals(userId)) {
+        if(!storedRefreshToken.getUser().getId().equals(userId)){
             throw new BadCredentialsException("Refresh token does not belong to this user");
         }
 
         //refresh token ko rotate:
         storedRefreshToken.setRevoked(true);
-        String newJti = UUID.randomUUID().toString();
+        String newJti= UUID.randomUUID().toString();
         storedRefreshToken.setReplacedByToken(newJti);
         refreshTokenRepository.save(storedRefreshToken);
 
@@ -139,18 +133,17 @@ public class AuthController {
                 .build();
 
         refreshTokenRepository.save(newRefreshTokenOb);
-        String newAccessToken = jwtService.generateAccessToken(user);
+        String newAccessToken= jwtService.generateAccessToken(user);
         String newRefreshToken = jwtService.generateRefreshToken(user, newRefreshTokenOb.getJti());
 
         cookieService.attachRefreshCookie(response, newRefreshToken, (int) jwtService.getRefreshTtlSeconds());
         cookieService.addNoStoreHeaders(response);
         return ResponseEntity.ok(TokenResponse.of(newAccessToken, newRefreshToken, jwtService.getAccessTtlSeconds(), modelMapper.map(user, UserDto.class)));
-
     }
 
     //this method will read refresh token from request header or body.
     private Optional<String> readRefreshTokenFromRequest(RefreshTokenRequest body, HttpServletRequest request) {
-//            1. prefer reading refresh token from cookie
+//      1. prefer reading refresh token from cookie
         if (request.getCookies() != null) {
             Optional<String> fromCookie = Arrays.stream(request.getCookies())
                     .filter(c -> cookieService.getRefreshTokenCookieName().equals(c.getName()))

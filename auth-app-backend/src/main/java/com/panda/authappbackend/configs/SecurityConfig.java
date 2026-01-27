@@ -3,6 +3,7 @@ package com.panda.authappbackend.configs;
 import com.panda.authappbackend.exceptions.GlobalExceptionHandler;
 import com.panda.authappbackend.security.CustomUserDetailsService;
 import com.panda.authappbackend.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +38,6 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomUserDetailsService userDetailsService;
     private final AuthenticationSuccessHandler successHandler;
 
     @Bean
@@ -59,21 +59,17 @@ public class SecurityConfig {
 //                                .requestMatchers(AppConstants.AUTH_GUEST_URLS).hasRole(AppConstants.GUEST_ROLE)
                                         .anyRequest().authenticated()
                 )
+                .formLogin(AbstractHttpConfigurer::disable)
                 .oauth2Login(oauth2 ->
                         oauth2
                                 .successHandler(successHandler)
-                                .failureHandler(null)
+                                .failureHandler((req, res, ex) -> {
+                                    res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Here is the fault in SecurityConfig: " + ex.getMessage());
+                                })
                 )
                 .logout(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
-    }
-
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
     }
 
     @Bean
