@@ -62,7 +62,7 @@ public class JwtService {
     public String generateRefreshToken(User user, String jti) {
         Instant now = Instant.now();
         return Jwts.builder()
-                .id(UUID.randomUUID().toString())
+                .id(jti)
                 .subject(user.getId().toString())
                 .issuer(issuer)
                 .issuedAt(Date.from(now))
