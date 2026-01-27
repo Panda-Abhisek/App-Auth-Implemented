@@ -25,6 +25,7 @@ public class CookieService {
             @Value("${security.jwt.refresh-token-cookie-name}") String refreshTokenCookieName,
             @Value("${security.jwt.cookie-http-only}") boolean cookieHttpOnly,
             @Value("${security.jwt.cookie-secure}") boolean cookieSecure,
+
             @Value("${security.jwt.cookie-same-site}") String cookieSameSite,
             @Value("${security.jwt.cookie-domain}") String cookieDomain
             ) {
@@ -49,9 +50,11 @@ public class CookieService {
         if(cookieDomain!=null && !cookieDomain.isBlank())
         {
             responseCookieBuilder.domain(cookieDomain);
+
         }
         ResponseCookie responseCookie = responseCookieBuilder.build();
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+
     }
 
     // Clear refresh cookie
@@ -67,6 +70,7 @@ public class CookieService {
         if(cookieDomain!=null && !cookieDomain.isBlank())
         {
             builder.domain(cookieDomain);
+
         }
 
         ResponseCookie responseCookie = builder.build();
@@ -78,4 +82,6 @@ public class CookieService {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
         response.setHeader("Pragma", "no-cache");
     }
+
+
 }

@@ -70,8 +70,6 @@ api.interceptors.response.use(
     try {
       console.log("start refreshing...");
       const loginResponse = await refreshToken();
-      console.log("Login response after refresh token - ", loginResponse);
-      
       const newToken = loginResponse.accessToken;
       if (!newToken) throw new Error("no access token received");
       useAuth
