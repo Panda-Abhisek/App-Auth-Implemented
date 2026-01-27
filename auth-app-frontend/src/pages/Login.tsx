@@ -1,4 +1,5 @@
 import useAuth from "@/auth/store";
+import OAuth2Buttons from "@/components/OAuth2Buttons";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,9 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import type LoginData from "@/models/LoginData";
-import { loginUser } from "@/services/AuthService";
 import { motion } from "framer-motion";
-import { CheckCircle2Icon, Github } from "lucide-react";
+import { CheckCircle2Icon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
@@ -86,29 +86,7 @@ export default function Login() {
             </p>
 
             {/* OAuth Buttons */}
-            <div className="space-y-3 mb-6">
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full rounded-2xl flex items-center gap-3"
-              >
-                <img
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  alt="Google"
-                  className="w-5 h-5"
-                />
-                Continue with Google
-              </Button>
-
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full rounded-2xl flex items-center gap-3"
-              >
-                <Github className="w-5 h-5" />
-                Continue with GitHub
-              </Button>
-            </div>
+            <OAuth2Buttons />
 
             {/* Divider */}
             <div className="flex items-center gap-4 my-6">

@@ -53,5 +53,5 @@ app:
     front-end-url: ${FRONTEND_URL:http://localhost:5173}
   auth:
     frontend:
-      success-redirect-url: ${FRONTEND_SUCCESS_REDIRECT_URL:http://localhost:5173/auth/success}
-      failure-redirect-url: ${FRONTEND_FAILURE_REDIRECT_URL:http://localhost:5173/auth/failure}
+      success-redirect-url: ${FRONTEND_SUCCESS_REDIRECT_URL:http://localhost:5173/oauth/success}
+      failure-redirect-url: ${FRONTEND_FAILURE_REDIRECT_URL:http://localhost:5173/oauth/failure}
