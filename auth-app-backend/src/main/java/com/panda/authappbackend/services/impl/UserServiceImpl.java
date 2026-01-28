@@ -1,10 +1,13 @@
 package com.panda.authappbackend.services.impl;
 
+import com.panda.authappbackend.configs.AppConstants;
 import com.panda.authappbackend.dtos.UserDto;
 import com.panda.authappbackend.exceptions.ResourceNotFoundException;
 import com.panda.authappbackend.helpers.UserHelper;
 import com.panda.authappbackend.models.Provider;
+import com.panda.authappbackend.models.Role;
 import com.panda.authappbackend.models.User;
+import com.panda.authappbackend.repositroies.RoleRepository;
 import com.panda.authappbackend.repositroies.UserRepository;
 import com.panda.authappbackend.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.UUID;
 
 @Service
@@ -22,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final RoleRepository roleRepository;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -36,6 +41,14 @@ public class UserServiceImpl implements UserService {
 //        log.info("User created to save: {}", user);
         // role assignment logic can be added here
         // TODO: Assign default role to user
+        Role defaultRole = roleRepository
+                .findByName(AppConstants.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("ROLE_USER not found"));
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+        user.getRoles().add(defaultRole);
+
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserDto.class);
     }

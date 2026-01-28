@@ -1,6 +1,6 @@
 package com.panda.authappbackend.configs;
 
-import com.panda.authappbackend.exceptions.GlobalExceptionHandler;
+import com.panda.authappbackend.dtos.ApiError;
 import com.panda.authappbackend.security.CustomUserDetailsService;
 import com.panda.authappbackend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -55,8 +55,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests ->
                                 authorizeHttpRequests
                                         .requestMatchers(AppConstants.AUTH_PUBLIC_URLS).permitAll()
-//                                .requestMatchers(AppConstants.AUTH_ADMIN_URLS).hasRole(AppConstants.ADMIN_ROLE)
-//                                .requestMatchers(AppConstants.AUTH_GUEST_URLS).hasRole(AppConstants.GUEST_ROLE)
+                                        .requestMatchers(AppConstants.AUTH_ADMIN_URLS).hasRole("ADMIN")
+                                        .requestMatchers(AppConstants.AUTH_USER_URLS).hasRole("USER")
                                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 ->
@@ -65,6 +65,29 @@ public class SecurityConfig {
                                 .failureHandler(null)
                 )
                 .logout(AbstractHttpConfigurer::disable)
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, e) -> {
+                    response.setStatus(401);
+                    response.setContentType("application/json");
+                    String message = e.getMessage();
+                    String error = (String) request.getAttribute("error");
+                    if (error != null) {
+                        message = error;
+                    }
+                    var apiError = ApiError.of(HttpStatus.UNAUTHORIZED.value(), "Unauthorized Access", message, request.getRequestURI(), true);
+                    var objectMapper = new ObjectMapper();
+                    response.getWriter().write(objectMapper.writeValueAsString(apiError));
+                }).accessDeniedHandler((request, response, e) -> {
+                            response.setStatus(403);
+                            response.setContentType("application/json");
+                            String message = e.getMessage();
+                            String error = (String) request.getAttribute("error");
+                            if (error != null) {
+                                message = error;
+                            }
+                            var apiError = ApiError.of(HttpStatus.FORBIDDEN.value(), "Forbidden Access", message, request.getRequestURI(), true);
+                            var objectMapper = new ObjectMapper();
+                            response.getWriter().write(objectMapper.writeValueAsString(apiError));
+                        }))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

@@ -166,7 +166,7 @@ function Signup() {
                 type="submit"
                 disabled={loading}
                 size="lg"
-                className="w-full rounded-2xl text-lg"
+                className="w-full cursor-pointer rounded-2xl text-lg"
               >
                 {loading ? (
                   <><Spinner /> Creating Account</>
